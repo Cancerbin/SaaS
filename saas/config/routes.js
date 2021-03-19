@@ -1,73 +1,58 @@
 export default [
   {
     path: '/',
-    component: '../layouts/BlankLayout',
+    component: '../layouts/SaasLayouts',
     routes: [
       {
-        path: '/user',
-        component: '../layouts/UserLayout',
-        routes: [
-          {
-            name: 'login',
-            path: '/user/login',
-            component: './User/login',
-          },
-        ],
-      },
-      {
         path: '/',
-        component: '../layouts/SecurityLayout',
         routes: [
           {
-            path: '/',
-            component: '../layouts/BasicLayout',
-            authority: ['admin', 'user'],
+            icon: 'MailFilled',
+            path: '/archives',
+            name: 'archives',
+            title: '档案管理',
+            component: './Navigation',
             routes: [
               {
-                path: '/',
-                redirect: '/welcome',
-              },
-              {
-                path: '/welcome',
-                name: 'welcome',
-                icon: 'smile',
-                component: './Welcome',
-              },
-              {
-                path: '/admin',
-                name: 'admin',
-                icon: 'crown',
-                component: './Admin',
-                authority: ['admin'],
+                icon: '',
+                path: '/archives/commodity',
+                name: 'archives.commodity',
+                title: '商品管理',
                 routes: [
                   {
-                    path: '/admin/sub-page',
-                    name: 'sub-page',
-                    icon: 'smile',
-                    component: './Welcome',
-                    authority: ['admin'],
-                  },
-                ],
-              },
-              {
-                name: 'list.table-list',
-                icon: 'table',
-                path: '/list',
-                component: './TableList',
-              },
-              {
-                component: './404',
-              },
-            ],
+                    path: '/archives/commodity/category',
+                    name: 'archives.commodity.category',
+                    title: '商品类别',
+                    component: './Welcome'
+                  }
+                ]
+              }
+            ]
           },
           {
-            component: './404',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    component: './404',
-  },
-];
+            path: '/purchase',
+            name: 'purchase',
+            title: '采购管理',
+            component: './Navigation',
+            routes: [
+              {
+                path: '/purchase/supplier',
+                name: 'purchase.supplier',
+                title: '供应商维护',
+                component: '../layouts/BlankLayout',
+                routes: [
+                  {
+                    path: '/purchase/supplier/area',
+                    name: 'purchase.supplier.area',
+                    title: '供应商区域',
+                    component: './404'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

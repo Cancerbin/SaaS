@@ -1,12 +1,19 @@
-import { queryNotices } from '@/services/user';
+import {
+  queryNotices
+} from '@/services/user';
 const GlobalModel = {
   namespace: 'global',
   state: {
+    tabList: [],
     collapsed: false,
     notices: [],
   },
   effects: {
-    *fetchNotices(_, { call, put, select }) {
+    * fetchNotices(_, {
+      call,
+      put,
+      select
+    }) {
       const data = yield call(queryNotices);
       yield put({
         type: 'saveNotices',
@@ -24,7 +31,12 @@ const GlobalModel = {
       });
     },
 
-    *clearNotices({ payload }, { put, select }) {
+    * clearNotices({
+      payload
+    }, {
+      put,
+      select
+    }) {
       yield put({
         type: 'saveClearedNotices',
         payload,
@@ -42,10 +54,17 @@ const GlobalModel = {
       });
     },
 
-    *changeNoticeReadState({ payload }, { put, select }) {
+    * changeNoticeReadState({
+      payload
+    }, {
+      put,
+      select
+    }) {
       const notices = yield select((state) =>
         state.global.notices.map((item) => {
-          const notice = { ...item };
+          const notice = {
+            ...item
+          };
 
           if (notice.id === payload) {
             notice.read = true;
@@ -66,19 +85,37 @@ const GlobalModel = {
         },
       });
     },
+
+
+    *updateTabList({
+      payload
+    }, {
+      put
+    }) {
+      yield put({
+        type: 'saveTabList',
+        payload,
+      });
+    }
   },
   reducers: {
     changeLayoutCollapsed(
       state = {
         notices: [],
         collapsed: true,
+      }, {
+        payload
       },
-      { payload },
     ) {
-      return { ...state, collapsed: payload };
+      return {
+        ...state,
+        collapsed: payload
+      };
     },
 
-    saveNotices(state, { payload }) {
+    saveNotices(state, {
+      payload
+    }) {
       return {
         collapsed: false,
         ...state,
@@ -90,8 +127,9 @@ const GlobalModel = {
       state = {
         notices: [],
         collapsed: true,
+      }, {
+        payload
       },
-      { payload },
     ) {
       return {
         ...state,
@@ -99,6 +137,16 @@ const GlobalModel = {
         notices: state.notices.filter((item) => item.type !== payload),
       };
     },
+
+    saveTabList(state, {
+      payload
+    }) {
+      sessionStorage.setItem('tabList', JSON.stringify(payload.tabList));
+      return {
+        ...state,
+        tabList: payload.tabList
+      }
+    }
   },
 };
 export default GlobalModel;
