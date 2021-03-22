@@ -1,0 +1,34 @@
+[
+  {
+    "name": "archives",
+    "title": "档案管理",
+    "children": [
+      {
+        "name": "commodity",
+        "title": "商品管理",
+        "children": [
+          {
+            "name": "category",
+            "title": "商品类别"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "purchase",
+    "title": "采购管理",
+    "children": [
+      {
+        "name": "supplier",
+        "title": "供应商维护",
+        "children": [
+          {
+            "name": "area",
+            "title": "供应商区域"
+          }
+        ]
+      }
+    ]
+  }
+]

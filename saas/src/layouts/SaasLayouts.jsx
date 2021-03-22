@@ -3,6 +3,7 @@ import { connect, history } from 'umi';
 import { SmileOutlined } from '@ant-design/icons';
 import NavTab from '@/components/NavTab';
 import AsyncComponent from '@/components/AsyncComponent';
+import SideMenu from '@/components/SideMenu';
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
@@ -11,6 +12,14 @@ class SaasLayout extends React.Component {
   }
 
   componentDidMount() {
+    const { dispatch } = this.props;
+    // 初始化SideMenu
+    dispatch({
+      type: 'global/updateSideMenu',
+      payload: {
+        menu: sessionStorage.getItem('sideMenuKey') || null
+      }
+    })
     // 初始化tab表
     this.saveTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
   }
@@ -93,12 +102,7 @@ class SaasLayout extends React.Component {
         <div className={styles.main}>
           {/* 导航栏 */}
           <div className={styles.nav}>
-            {routerList.map(item => (
-              <dl key={item.name} className={location.pathname.indexOf(item.path) < 0 ? null : styles.active} onClick={() => this.linkRouter(item)}>
-                <dt><SmileOutlined /></dt>
-                <dd>{item.title}</dd>
-              </dl>
-            ))}
+            <SideMenu />
           </div>
           {/* 内容区 */}
           <div className={styles.content}>
@@ -106,8 +110,19 @@ class SaasLayout extends React.Component {
               <NavTab location={location} />
             </div>
             <div className={styles.details}>
-              {/* {children} */}
-              {tabLayout.map(item => (<AsyncComponent info={item} />))}
+              {children}
+              {/* {tabLayout.map(item => (
+                <>
+                  {item.path.split('/').length > 2 ?
+                    <>
+                      {location.pathname === item.path &&
+                        <AsyncComponent {...item} />
+                      }
+                    </> :
+                    <>{children}</>
+                  }
+                </>
+              ))} */}
             </div>
           </div>
         </div>
