@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect, history } from 'umi';
-import { SmileOutlined } from '@ant-design/icons';
-import NavTab from '@/components/NavTab';
 import AsyncComponent from '@/components/AsyncComponent';
 import SideMenu from '@/components/SideMenu';
+import TopMenu from '@/components/TopMenu';
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
@@ -18,6 +17,13 @@ class SaasLayout extends React.Component {
       type: 'global/updateSideMenu',
       payload: {
         menu: sessionStorage.getItem('sideMenuKey') || null
+      }
+    })
+    // 初始化TabKey
+    dispatch({
+      type: 'global/updateTabKey',
+      payload: {
+        menu: sessionStorage.getItem('tabKey') || null
       }
     })
     // 初始化tab表
@@ -91,9 +97,7 @@ class SaasLayout extends React.Component {
   }
 
   render() {
-    const { children, route, location } = this.props;
-    const { tabLayout } = this.state;
-    const routerList = route.children[0].routes;
+    const { children, tabList, tabKey } = this.props;
     return (
       <div className={styles.wrapper}>
         {/* 顶部信息栏 */}
@@ -107,22 +111,12 @@ class SaasLayout extends React.Component {
           {/* 内容区 */}
           <div className={styles.content}>
             <div className={styles.menus}>
-              <NavTab location={location} />
+              <TopMenu />
             </div>
             <div className={styles.details}>
-              {children}
-              {/* {tabLayout.map(item => (
-                <>
-                  {item.path.split('/').length > 2 ?
-                    <>
-                      {location.pathname === item.path &&
-                        <AsyncComponent {...item} />
-                      }
-                    </> :
-                    <>{children}</>
-                  }
-                </>
-              ))} */}
+              {tabList.map(item => (
+                <div className={`${styles.tabLayout} ${item.name === tabKey ? styles.active : null}`}>{item.component ? <AsyncComponent {...item} /> : <>{children}</>}</div>
+              ))}
             </div>
           </div>
         </div>
@@ -133,4 +127,5 @@ class SaasLayout extends React.Component {
 
 export default connect(({ global }) => ({
   tabList: global.tabList,
+  tabKey: global.tabKey
 }))(SaasLayout);

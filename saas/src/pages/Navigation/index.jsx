@@ -12,36 +12,45 @@ class Navigation extends React.Component {
   componentDidMount() { }
 
   // 跳转路由
-  linkRouter = (params) => {
+  linkRouter = (item) => {
     const { dispatch, tabList } = this.props;
-    const tempList = [...tabList];
-    const index = tempList.findIndex(item => item.name && item.name === params.name);
-    const tempTabItem = {
-      name: params.name,
-      path: params.path,
-      title: params.title,
-    };
-    if (index < 0) {
-      tempList.push(tempTabItem)
+    const newTabList = [...tabList];
+    const tabIndex = newTabList.findIndex(tab => tab.name && tab.name === item.name);
+    const tabItem = {
+      name: item.name,
+      title: item.title,
+      component: item.component
+    }
+    // 判断是否存在该Tab
+    if (tabIndex < 0) {
+      newTabList.push(tabItem);
       dispatch({
         type: 'global/updateTabList',
         payload: {
-          tabList: tempList
+          tabList: newTabList
         }
       })
     }
-    history.push({
-      pathname: params.path
+    dispatch({
+      type: 'global/updateTabKey',
+      payload: {
+        tab: item.name
+      }
+    }).then(() => {
+      history.push({
+        pathname: item.path
+      })
     })
   }
 
   render() {
     const { sideMenuKey } = this.props;
     const menuList = routerJson.filter(item => item.name === sideMenuKey);
+    const subMenuList = menuList[0].children;
     return (
       <>
         <Card>
-          {menuList.map(item => (
+          {subMenuList.map(item => (
             <dl className={styles.menuColumn}>
               <dt><DesktopOutlined /></dt>
               <dd>

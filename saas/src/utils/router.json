@@ -8,8 +8,10 @@
         "title": "商品管理",
         "children": [
           {
+            "path": "/archives/commodity/category",
             "name": "category",
-            "title": "商品类别"
+            "title": "商品类别",
+            "component": "Archives/Commodity/Category"
           }
         ]
       }

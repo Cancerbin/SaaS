@@ -1,15 +1,11 @@
 import { dynamic } from 'umi';
 
 export default (props) => {
-  const pathLen = props.path.split('/');
   let Comp;
-  if (pathLen > 2) {
-    url = `@/pages/${props.file}`;
-  } else {
+  if (props.component) {
     Comp = dynamic({
-      loader: () => import('@/pages/Navigation')
+      loader: () => import(`@/pages/${props.component}/index.jsx`)
     })
   }
-  console.log(Comp)
   return <Comp />;
 };

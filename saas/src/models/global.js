@@ -6,6 +6,7 @@ const GlobalModel = {
   state: {
     sideMenuKey: null,
     tabList: [],
+    tabKey: null
   },
   effects: {
     *updateSideMenu({ payload }, { put }) {
@@ -19,7 +20,13 @@ const GlobalModel = {
         type: 'saveTabList',
         payload,
       });
-    }
+    },
+    *updateTabKey({ payload }, { put }) {
+      yield put({
+        type: 'saveTabKey',
+        payload,
+      });
+    },
   },
   reducers: {
     saveSideMenu(state, { payload }) {
@@ -34,6 +41,13 @@ const GlobalModel = {
       return {
         ...state,
         tabList: payload.tabList
+      }
+    },
+    saveTabKey(state, { payload }) {
+      sessionStorage.setItem('tabKey', JSON.stringify(payload.tab));
+      return {
+        ...state,
+        tabKey: payload.tab
       }
     }
   },
