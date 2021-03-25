@@ -1,39 +1,47 @@
 import React from 'react';
 import { connect, history } from 'umi';
-import { SmileOutlined } from '@ant-design/icons';
-import NavTab from '@/components/NavTab';
+import AsyncComponent from '@/components/AsyncComponent';
+import SideMenu from '@/components/SideMenu';
+import TopMenu from '@/components/TopMenu';
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
+  state = {
+    tabLayout: []
+  }
+
   componentDidMount() {
+    const { dispatch } = this.props;
+    // 初始化SideMenu
+    dispatch({
+      type: 'global/updateSideMenu',
+      payload: {
+        menu: sessionStorage.getItem('sideMenuKey') || null
+      }
+    })
+    // 初始化TabKey
+    dispatch({
+      type: 'global/updateTabKey',
+      payload: {
+        tab: sessionStorage.getItem('tabKey') || ''
+      }
+    })
     // 初始化tab表
     this.saveTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
   }
 
-  // 跳转路由
-  linkRouter = (params) => {
-    const { location } = this.props;
-    if (params.path === location.pathname) return;
-    const { tabList } = this.props;
-    const tempList = [...tabList];
-    const index = tempList.findIndex(item => item.path && item.path.split('/').length === 2);
-    const tempTabItem = {
-      name: params.name,
-      path: params.path,
-      title: params.title
-    };
-    if (index < 0) {
-      tempList.unshift(tempTabItem);
-    } else {
-      tempList[0] = tempTabItem;
-    }
-    this.saveTabList(tempList);
-    history.replace({
-      pathname: params.path,
-      state: {
-        type: params.type
+  digui = (arr) => {
+    const tempArray = [];
+    arr.forEach(item => {
+      tempArray.push(item);
+      if (item.routes) {
+        const tempa = this.digui(item.routes);
+        tempa.forEach(i => {
+          tempArray.push(i)
+        })
       }
     })
+    return tempArray;
   }
 
   // 保存tab页
@@ -44,13 +52,25 @@ class SaasLayout extends React.Component {
       payload: {
         tabList: arr
       }
+    }).then(res => {
+      this.formateTab();
+    })
+  }
+
+  formateTab = () => {
+    const { tabList, route } = this.props;
+    const itit = this.digui(route.routes);
+    const tempJson = [];
+    tabList.forEach(item => {
+      tempJson.push(itit.filter(x => x.name === item.name)[0])
+    })
+    this.setState({
+      tabLayout: tempJson
     })
   }
 
   render() {
-    const { children, route, location } = this.props;
-    const routerList = route.children[0].routes;
-    console.log(children)
+    const { tabList, tabKey } = this.props;
     return (
       <div className={styles.wrapper}>
         {/* 顶部信息栏 */}
@@ -59,20 +79,17 @@ class SaasLayout extends React.Component {
         <div className={styles.main}>
           {/* 导航栏 */}
           <div className={styles.nav}>
-            {routerList.map(item => (
-              <dl key={item.name} className={location.pathname.indexOf(item.path) < 0 ? null : styles.active} onClick={() => this.linkRouter(item)}>
-                <dt><SmileOutlined /></dt>
-                <dd>{item.title}</dd>
-              </dl>
-            ))}
+            <SideMenu />
           </div>
           {/* 内容区 */}
           <div className={styles.content}>
             <div className={styles.menus}>
-              <NavTab location={location} />
+              <TopMenu />
             </div>
             <div className={styles.details}>
-              {children}
+              {tabList.map(item => (
+                <div className={`${styles.tabLayout} ${item.name === tabKey ? styles.active : null}`} key={item.name}>{<AsyncComponent {...item} />}</div>
+              ))}
             </div>
           </div>
         </div>
@@ -83,4 +100,5 @@ class SaasLayout extends React.Component {
 
 export default connect(({ global }) => ({
   tabList: global.tabList,
+  tabKey: global.tabKey
 }))(SaasLayout);

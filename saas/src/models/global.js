@@ -44,7 +44,7 @@ const GlobalModel = {
       }
     },
     saveTabKey(state, { payload }) {
-      sessionStorage.setItem('tabKey', JSON.stringify(payload.tab));
+      sessionStorage.setItem('tabKey', payload.tab);
       return {
         ...state,
         tabKey: payload.tab

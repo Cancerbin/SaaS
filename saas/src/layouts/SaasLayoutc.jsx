@@ -1,31 +1,11 @@
 import React from 'react';
 import { connect, history } from 'umi';
-import AsyncComponent from '@/components/AsyncComponent';
-import SideMenu from '@/components/SideMenu';
-import TopMenu from '@/components/TopMenu';
+import { SmileOutlined } from '@ant-design/icons';
+import NavTab from '@/components/NavTab';
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
-  state = {
-    tabLayout: []
-  }
-
   componentDidMount() {
-    const { dispatch } = this.props;
-    // 初始化SideMenu
-    dispatch({
-      type: 'global/updateSideMenu',
-      payload: {
-        menu: sessionStorage.getItem('sideMenuKey') || null
-      }
-    })
-    // 初始化TabKey
-    dispatch({
-      type: 'global/updateTabKey',
-      payload: {
-        menu: sessionStorage.getItem('tabKey') || null
-      }
-    })
     // 初始化tab表
     this.saveTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
   }
@@ -56,21 +36,6 @@ class SaasLayout extends React.Component {
     })
   }
 
-
-  digui = (arr) => {
-    const tempArray = [];
-    arr.forEach(item => {
-      tempArray.push(item);
-      if (item.routes) {
-        const tempa = this.digui(item.routes);
-        tempa.forEach(i => {
-          tempArray.push(i)
-        })
-      }
-    })
-    return tempArray;
-  }
-
   // 保存tab页
   saveTabList = (arr) => {
     const { dispatch } = this.props;
@@ -79,25 +44,13 @@ class SaasLayout extends React.Component {
       payload: {
         tabList: arr
       }
-    }).then(res => {
-      this.formateTab();
-    })
-  }
-
-  formateTab = () => {
-    const { tabList, route } = this.props;
-    const itit = this.digui(route.routes);
-    const tempJson = [];
-    tabList.forEach(item => {
-      tempJson.push(itit.filter(x => x.name === item.name)[0])
-    })
-    this.setState({
-      tabLayout: tempJson
     })
   }
 
   render() {
-    const { children, tabList, tabKey } = this.props;
+    const { children, route, location } = this.props;
+    const routerList = route.children[0].routes;
+    console.log(children)
     return (
       <div className={styles.wrapper}>
         {/* 顶部信息栏 */}
@@ -106,17 +59,20 @@ class SaasLayout extends React.Component {
         <div className={styles.main}>
           {/* 导航栏 */}
           <div className={styles.nav}>
-            <SideMenu />
+            {routerList.map(item => (
+              <dl key={item.name} className={location.pathname.indexOf(item.path) < 0 ? null : styles.active} onClick={() => this.linkRouter(item)}>
+                <dt><SmileOutlined /></dt>
+                <dd>{item.title}</dd>
+              </dl>
+            ))}
           </div>
           {/* 内容区 */}
           <div className={styles.content}>
             <div className={styles.menus}>
-              <TopMenu />
+              <NavTab location={location} />
             </div>
             <div className={styles.details}>
-              {tabList.map(item => (
-                <div className={`${styles.tabLayout} ${item.name === tabKey ? styles.active : null}`}>{item.component ? <AsyncComponent {...item} /> : <>{children}</>}</div>
-              ))}
+              {children}
             </div>
           </div>
         </div>
@@ -127,5 +83,4 @@ class SaasLayout extends React.Component {
 
 export default connect(({ global }) => ({
   tabList: global.tabList,
-  tabKey: global.tabKey
 }))(SaasLayout);

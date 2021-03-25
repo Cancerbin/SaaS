@@ -1,21 +1,20 @@
 import React from 'react';
 import { connect, history } from 'umi';
 import { Tag } from 'antd';
-import { SmileOutlined } from '@ant-design/icons';
-import routerJson from '@/utils/router.json';
 
 class TopMenu extends React.Component {
-  // 跳转路由
-  linkRouter = (item) => {
+  // 切换tab
+  changeTab = (item) => {
     const { dispatch } = this.props;
+    const pathUrl = `/${item.name.split('.').join('/')}`;
     dispatch({
-      type: 'global/updateSideMenu',
+      type: 'global/updateTabKey',
       payload: {
-        menu: item.name
+        tab: item.name
       }
     }).then(() => {
       history.push({
-        pathname: '/nav'
+        pathname: pathUrl
       })
     })
   }
@@ -24,7 +23,7 @@ class TopMenu extends React.Component {
     const { tabList } = this.props;
     return (
       <div>
-        {tabList.map(item => <Tag key={item.name} color="#2db7f5" closable>{item.title}</Tag>)}
+        {tabList.map(item => <Tag key={item.name} color="#2db7f5" closable onClick={() => this.changeTab(item)}>{item.title}</Tag>)}
       </div>
     )
   }

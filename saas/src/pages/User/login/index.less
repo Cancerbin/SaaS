@@ -1,44 +1,28 @@
-@import '~antd/es/style/themes/default.less';
+.loginLayout {
+  width: 100%;
+  height: 100%;
+  background-image: url(../../../assets/login/background.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 
-.main {
-  width: 328px;
-  margin: 0 auto;
-  @media screen and (max-width: @screen-sm) {
-    width: 95%;
-    max-width: 328px;
-  }
+  .wrapper {
+    position: fixed;
+    top: 50%;
+    right: 10%;
+    width: 400px;
+    height: 450px;
+    border-radius: 6px;
+    background-color: #fff;
+    transform: translateY(-50%);
 
-  :global {
-    .@{ant-prefix}-tabs-nav-list {
-      margin: auto;
-      font-size: 16px;
+    .content {
+      width: 88%;
+      margin: 35px auto 0;
+
+      .icon {
+        color: rgba(0, 0, 0, .25);
+      }
     }
-  }
-
-  .icon {
-    margin-left: 16px;
-    color: rgba(0, 0, 0, 0.2);
-    font-size: 24px;
-    vertical-align: middle;
-    cursor: pointer;
-    transition: color 0.3s;
-
-    &:hover {
-      color: @primary-color;
-    }
-  }
-
-  .other {
-    margin-top: 24px;
-    line-height: 22px;
-    text-align: left;
-    .register {
-      float: right;
-    }
-  }
-
-  .prefixIcon {
-    color: @primary-color;
-    font-size: @font-size-base;
   }
 }

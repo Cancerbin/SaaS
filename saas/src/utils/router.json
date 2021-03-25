@@ -1,32 +1,34 @@
 [
   {
+    "path": "/nav",
     "name": "archives",
     "title": "档案管理",
     "children": [
       {
-        "name": "commodity",
+        "name": "archives.commodity",
         "title": "商品管理",
         "children": [
           {
             "path": "/archives/commodity/category",
-            "name": "category",
-            "title": "商品类别",
-            "component": "Archives/Commodity/Category"
+            "name": "archives.commodity.category",
+            "title": "商品类别"
           }
         ]
       }
     ]
   },
   {
+    "path": "/nav",
     "name": "purchase",
     "title": "采购管理",
     "children": [
       {
-        "name": "supplier",
+        "name": "purchase.supplier",
         "title": "供应商维护",
         "children": [
           {
-            "name": "area",
+            "path": "/purchase/supplier/area",
+            "name": "purchase.supplier.area",
             "title": "供应商区域"
           }
         ]

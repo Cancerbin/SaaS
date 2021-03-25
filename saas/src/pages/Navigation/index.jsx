@@ -14,12 +14,12 @@ class Navigation extends React.Component {
   // 跳转路由
   linkRouter = (item) => {
     const { dispatch, tabList } = this.props;
+    const pathUrl = `/${item.name.split('.').join('/')}`;
     const newTabList = [...tabList];
     const tabIndex = newTabList.findIndex(tab => tab.name && tab.name === item.name);
     const tabItem = {
       name: item.name,
-      title: item.title,
-      component: item.component
+      title: item.title
     }
     // 判断是否存在该Tab
     if (tabIndex < 0) {
@@ -38,7 +38,7 @@ class Navigation extends React.Component {
       }
     }).then(() => {
       history.push({
-        pathname: item.path
+        pathname: pathUrl
       })
     })
   }
@@ -51,7 +51,7 @@ class Navigation extends React.Component {
       <>
         <Card>
           {subMenuList.map(item => (
-            <dl className={styles.menuColumn}>
+            <dl className={styles.menuColumn} key={item.name}>
               <dt><DesktopOutlined /></dt>
               <dd>
                 <div className={styles.title}>{item.title}</div>
