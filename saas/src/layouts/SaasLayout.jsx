@@ -28,6 +28,12 @@ class SaasLayout extends React.Component {
     })
     // 初始化tab表
     this.saveTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
+
+    // 监听路由变化
+    history.listen((location, action) => {
+      // 可以在这里控制tab选项卡的切换
+      console.log(location.pathname);
+    });
   }
 
   digui = (arr) => {

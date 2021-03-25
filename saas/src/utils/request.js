@@ -1,6 +1,6 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import { extend } from 'umi-request';
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -21,14 +21,13 @@ const codeMessage = {
 /** 异常处理程序 */
 
 const errorHandler = (error) => {
-  const { response } = error;
-
+  const { response, data } = error;
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
     notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
+      message: `请求错误 ${status}`,
+      description: data.errorMsg,
     });
   } else if (!response) {
     notification.error({
@@ -46,4 +45,22 @@ const request = extend({
   // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
 });
+
+request.interceptors.request.use((url, options) => {
+  options.headers.Authorization = "Basic ZGJzX3dlYjpkYnNfd2ViX3NlY3JldA==";
+  options.headers.tenant = "MDAwMA==";
+  return {
+    url: `${url}`,
+    options: { ...options },
+  };
+});
+
+request.interceptors.response.use((response, options) => {
+  // 处理get请求图片流
+  if (options.method === 'GET') {
+    return response.blob();
+  }
+  return response;
+});
+
 export default request;

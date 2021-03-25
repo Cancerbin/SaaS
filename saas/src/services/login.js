@@ -8,3 +8,16 @@ export async function fakeAccountLogin(params) {
 export async function getFakeCaptcha(mobile) {
   return request(`/api/login/captcha?mobile=${mobile}`);
 }
+
+// 用户登录
+export async function userLogin(params) {
+  return request('/api/oauth/noToken/login', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 获取登录验证码
+export async function queryVerifyCode(params) {
+  return request(`/api/oauth/anno/captcha?key=${params.key}`);
+}
