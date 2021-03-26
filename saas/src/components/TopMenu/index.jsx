@@ -5,17 +5,9 @@ import { Tag } from 'antd';
 class TopMenu extends React.Component {
   // 切换tab
   changeTab = (item) => {
-    const { dispatch } = this.props;
     const pathUrl = `/${item.name.split('.').join('/')}`;
-    dispatch({
-      type: 'global/updateTabKey',
-      payload: {
-        tab: item.name
-      }
-    }).then(() => {
-      history.push({
-        pathname: pathUrl
-      })
+    history.push({
+      pathname: pathUrl
     })
   }
 

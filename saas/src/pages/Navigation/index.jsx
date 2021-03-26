@@ -13,33 +13,9 @@ class Navigation extends React.Component {
 
   // 跳转路由
   linkRouter = (item) => {
-    const { dispatch, tabList } = this.props;
     const pathUrl = `/${item.name.split('.').join('/')}`;
-    const newTabList = [...tabList];
-    const tabIndex = newTabList.findIndex(tab => tab.name && tab.name === item.name);
-    const tabItem = {
-      name: item.name,
-      title: item.title
-    }
-    // 判断是否存在该Tab
-    if (tabIndex < 0) {
-      newTabList.push(tabItem);
-      dispatch({
-        type: 'global/updateTabList',
-        payload: {
-          tabList: newTabList
-        }
-      })
-    }
-    dispatch({
-      type: 'global/updateTabKey',
-      payload: {
-        tab: item.name
-      }
-    }).then(() => {
-      history.push({
-        pathname: pathUrl
-      })
+    history.push({
+      pathname: pathUrl
     })
   }
 

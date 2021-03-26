@@ -3,6 +3,7 @@ import { connect, history } from 'umi';
 import AsyncComponent from '@/components/AsyncComponent';
 import SideMenu from '@/components/SideMenu';
 import TopMenu from '@/components/TopMenu';
+import routerJson from '@/utils/router.json';
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
@@ -19,21 +20,62 @@ class SaasLayout extends React.Component {
         menu: sessionStorage.getItem('sideMenuKey') || null
       }
     })
-    // 初始化TabKey
-    dispatch({
-      type: 'global/updateTabKey',
-      payload: {
-        tab: sessionStorage.getItem('tabKey') || ''
-      }
-    })
     // 初始化tab表
-    this.saveTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
-
+    this.updateTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
+    // 初始化TabKey
+    this.updateTabKey(sessionStorage.getItem('tabKey') || null);
     // 监听路由变化
     history.listen((location, action) => {
-      // 可以在这里控制tab选项卡的切换
-      console.log(location.pathname);
+      const tabList = JSON.parse(sessionStorage.getItem('tabList') || '[]');
+      // 获取当前tab
+      const currentPath = location.pathname;
+      if (currentPath !== '/') {
+        const currentPathNameArray = currentPath.slice(1, currentPath.length).split('/');
+        const currentPathName = currentPathNameArray.join('.');
+        const currentTabArray = tabList.filter(item => item.name === currentPathName);
+        // 判断tabList中是否包含当前tab
+        if (currentTabArray.length === 0) {
+          const newTabList = [...tabList];
+          const parentRouterArray = routerJson.filter(item => item.name === currentPathNameArray[0]);
+          if (currentPathNameArray.length === 1) {
+            const routerItem = {};
+            if (currentPath === '/nav') {
+              routerItem.name = 'nav';
+              routerItem.title = '导航页';
+            }
+            newTabList.unshift(routerItem);
+          } else if (currentPathNameArray.length === 3) {
+            const middleRouterArray = parentRouterArray[0].children.filter(item => item.name === `${currentPathNameArray[0]}.${currentPathNameArray[1]}`);
+            const childRouterArray = middleRouterArray[0].children.filter(item => item.name === currentPathName);
+            newTabList.push(childRouterArray[0]);
+          }
+          this.updateTabList(newTabList);
+        }
+        this.updateTabKey(currentPathName);
+      }
     });
+  }
+
+  // 更新tabList
+  updateTabList = (arr) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/updateTabList',
+      payload: {
+        tabList: arr
+      }
+    })
+  }
+
+  // 更新tabKey
+  updateTabKey = (tab) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "global/updateTabKey",
+      payload: {
+        tab: tab
+      }
+    })
   }
 
   digui = (arr) => {

@@ -7,34 +7,11 @@ import styles from './index.less';
 class SideMenu extends React.Component {
   // 跳转路由
   linkRouter = (item) => {
-    const { dispatch, tabList } = this.props;
-    const newTabList = [...tabList];
-    const tabIndex = newTabList.findIndex(tab => tab.name && tab.name === 'nav');
-    const tabItem = {
-      name: 'nav',
-      title: '导航页'
-    }
-    if (tabIndex < 0) {
-      newTabList.push(tabItem);
-      dispatch({
-        type: 'global/updateTabList',
-        payload: {
-          tabList: newTabList
-        }
-      })
-    }
-    // 更新边栏菜单
+    const { dispatch } = this.props;
     dispatch({
       type: 'global/updateSideMenu',
       payload: {
         menu: item.name
-      }
-    })
-    // 更新tab
-    dispatch({
-      type: 'global/updateTabKey',
-      payload: {
-        tab: tabItem.name
       }
     }).then(() => {
       history.push({
