@@ -1,6 +1,6 @@
 import { stringify } from 'querystring';
 import { history } from 'umi';
-import { userLogin, queryVerifyCode } from '@/services/login';
+import { userLogin, queryVerifyCode, queryRouterMenu } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 const Model = {
@@ -12,53 +12,29 @@ const Model = {
     *login({ payload }, { call, put }) {
       const response = yield call(userLogin, payload);
       if (response.code === 0) {
+        const { data } = response;
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('account', data.account);
+
+        // 请求路由菜单
+        // const routerResponse = yield call(queryRouterMenu, {
+        //   userId: data.userId
+        // });
         history.replace('/');
       }
-      // yield put({
-      //   type: 'changeLoginStatus',
-      //   payload: response,
-      // }); // Login successfully
-
-      // if (response.status === 'ok') {
-      //   const urlParams = new URL(window.location.href);
-      //   const params = getPageQuery();
-      //   message.success('🎉 🎉 🎉  登录成功！');
-      //   let { redirect } = params;
-
-      //   if (redirect) {
-      //     const redirectUrlParams = new URL(redirect);
-
-      //     if (redirectUrlParams.origin === urlParams.origin) {
-      //       redirect = redirect.substr(urlParams.origin.length);
-
-      //       if (window.routerBase !== '/') {
-      //         redirect = redirect.replace(window.routerBase, '/');
-      //       }
-
-      //       if (redirect.match(/^\/.*#/)) {
-      //         redirect = redirect.substr(redirect.indexOf('#') + 1);
-      //       }
-      //     } else {
-      //       window.location.href = '/';
-      //       return;
-      //     }
-      //   }
-
-      //   history.replace(redirect || '/');
-      // }
+    },
+    logout() {
+      sessionStorage.removeItem('tabList');
+      sessionStorage.removeItem('tabKey');
+      sessionStorage.removeItem('sideMenuKey');
+      history.replace({
+        pathname: '/user/login'
+      });
     },
 
-    logout() {
-      const { redirect } = getPageQuery(); // Note: There may be security issues, please note
-
-      if (window.location.pathname !== '/user/login' && !redirect) {
-        history.replace({
-          pathname: '/user/login',
-          search: stringify({
-            redirect: window.location.href,
-          }),
-        });
-      }
+    *queryRouterMenu({ payload }, { call, put }) {
+      const response = yield call(queryRouterMenu, payload);
+      return response;
     },
 
     *queryVerifyCode({ payload }, { call, put }) {

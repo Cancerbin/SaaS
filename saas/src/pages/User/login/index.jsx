@@ -42,6 +42,8 @@ class Login extends React.Component {
   submitLogin = (values) => {
     const { dispatch } = this.props;
     const { verifyKey } = this.state;
+    const tenantValue = window.btoa(encodeURIComponent(values.organization));
+    sessionStorage.setItem("tenant", tenantValue);
     dispatch({
       type: "login/login",
       payload: {
@@ -50,7 +52,7 @@ class Login extends React.Component {
         key: verifyKey,
         code: values.verify,
         grantType: 'captcha',
-        tenant: window.btoa(encodeURIComponent(values.organization))
+        tenant: tenantValue
       }
     })
   }
@@ -66,8 +68,8 @@ class Login extends React.Component {
               size="large"
               initialValues={{
                 organization: '0000',
-                username: 'lamp',
-                password: 'lamp',
+                username: '1001',
+                password: '1001',
                 remember: true
               }}
               onFinish={this.submitLogin}

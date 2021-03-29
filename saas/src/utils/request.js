@@ -47,8 +47,15 @@ const request = extend({
 });
 
 request.interceptors.request.use((url, options) => {
+  const tenantValue = sessionStorage.getItem("tenant");
+  options.headers.tenant = tenantValue;
   options.headers.Authorization = "Basic ZGJzX3dlYjpkYnNfd2ViX3NlY3JldA==";
-  options.headers.tenant = "MDAwMA==";
+  if (url === '/api/oauth/noToken/login') {
+
+  } else {
+    const token = sessionStorage.getItem("token");
+    options.headers.token = token;
+  }
   return {
     url: `${url}`,
     options: { ...options },

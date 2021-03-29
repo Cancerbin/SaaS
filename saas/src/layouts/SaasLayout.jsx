@@ -1,9 +1,12 @@
 import React from 'react';
 import { connect, history } from 'umi';
+import { Menu, Dropdown } from 'antd';
+import { DownOutlined, LogoutOutlined } from '@ant-design/icons';
 import AsyncComponent from '@/components/AsyncComponent';
 import SideMenu from '@/components/SideMenu';
 import TopMenu from '@/components/TopMenu';
 import routerJson from '@/utils/router.json';
+import Logo from '@/assets/logo.png'
 import styles from './saas.less';
 
 class SaasLayout extends React.Component {
@@ -117,12 +120,36 @@ class SaasLayout extends React.Component {
     })
   }
 
+  // 用户操作
+  userOperate = ({ key }) => {
+    const { dispatch } = this.props;
+    if (key === "logout") {
+      dispatch({
+        type: "login/logout",
+        payload: {}
+      })
+    }
+  }
+
   render() {
     const { tabList, tabKey } = this.props;
+    const userName = sessionStorage.getItem('account');
+    const menu = (
+      <Menu onClick={this.userOperate}>
+        <Menu.Item key="logout"><LogoutOutlined /> 退出登录</Menu.Item>
+      </Menu>
+    );
     return (
       <div className={styles.wrapper}>
         {/* 顶部信息栏 */}
-        <div className={styles.header}></div>
+        <div className={styles.header}>
+          <div className={styles.logo}>
+            <img src={Logo} alt="logo" />
+          </div>
+          <div className={styles.account}>
+            <Dropdown overlay={menu}><a>{userName} <DownOutlined /></a></Dropdown>
+          </div>
+        </div>
         {/* 主体 */}
         <div className={styles.main}>
           {/* 导航栏 */}
@@ -146,7 +173,7 @@ class SaasLayout extends React.Component {
   }
 }
 
-export default connect(({ global }) => ({
+export default connect(({ global, login }) => ({
   tabList: global.tabList,
   tabKey: global.tabKey
 }))(SaasLayout);

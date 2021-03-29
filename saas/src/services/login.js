@@ -21,3 +21,8 @@ export async function userLogin(params) {
 export async function queryVerifyCode(params) {
   return request(`/api/oauth/anno/captcha?key=${params.key}`);
 }
+
+// 获取菜单栏
+export async function queryRouterMenu(params) {
+  return request(`/api/oauth/menu/router?userId=${params.userId}`);
+}

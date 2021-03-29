@@ -5,6 +5,17 @@
     "title": "档案管理",
     "children": [
       {
+        "name": "archives.aegis",
+        "title": "商品维护",
+        "children": [
+          {
+            "path": "/archives/aegis/record",
+            "name": "archives.aegis.record",
+            "title": "商品档案"
+          }
+        ]
+      },
+      {
         "name": "archives.commodity",
         "title": "商品管理",
         "children": [
