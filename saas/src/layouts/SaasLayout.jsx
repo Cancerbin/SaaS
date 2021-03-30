@@ -5,7 +5,6 @@ import { DownOutlined, LogoutOutlined } from '@ant-design/icons';
 import AsyncComponent from '@/components/AsyncComponent';
 import SideMenu from '@/components/SideMenu';
 import TopMenu from '@/components/TopMenu';
-import routerJson from '@/utils/router.json';
 import Logo from '@/assets/logo.png'
 import styles from './saas.less';
 
@@ -32,29 +31,31 @@ class SaasLayout extends React.Component {
       const tabList = JSON.parse(sessionStorage.getItem('tabList') || '[]');
       // 获取当前tab
       const currentPath = location.pathname;
+      const routerArray = JSON.parse(sessionStorage.getItem('router') || '[]');
       if (currentPath !== '/') {
         const currentPathNameArray = currentPath.slice(1, currentPath.length).split('/');
-        const currentPathName = currentPathNameArray.join('.');
-        const currentTabArray = tabList.filter(item => item.name === currentPathName);
+        const currentTabArray = tabList.filter(item => item.path === currentPath);
         // 判断tabList中是否包含当前tab
         if (currentTabArray.length === 0) {
           const newTabList = [...tabList];
-          const parentRouterArray = routerJson.filter(item => item.name === currentPathNameArray[0]);
           if (currentPathNameArray.length === 1) {
             const routerItem = {};
             if (currentPath === '/nav') {
-              routerItem.name = 'nav';
-              routerItem.title = '导航页';
+              routerItem.name = '导航页';
+              routerItem.path = '/nav';
             }
             newTabList.unshift(routerItem);
-          } else if (currentPathNameArray.length === 3) {
-            const middleRouterArray = parentRouterArray[0].children.filter(item => item.name === `${currentPathNameArray[0]}.${currentPathNameArray[1]}`);
-            const childRouterArray = middleRouterArray[0].children.filter(item => item.name === currentPathName);
-            newTabList.push(childRouterArray[0]);
+          } else if (currentPathNameArray.length === 4) {
+            const routerAll = this.UnfoldRouterArray(routerArray);
+            const routerItem = {};
+            const routerInfo = routerAll.filter(item => item.path === currentPath);
+            routerItem.name = routerInfo[0].name || '未知';
+            routerItem.path = currentPath;
+            newTabList.push(routerItem);
           }
           this.updateTabList(newTabList);
         }
-        this.updateTabKey(currentPathName);
+        this.updateTabKey(currentPath);
       }
     });
   }
@@ -104,6 +105,21 @@ class SaasLayout extends React.Component {
     }
   }
 
+  // 展开路由数组
+  UnfoldRouterArray = (arr) => {
+    const tempArr = [];
+    arr.forEach(item => {
+      tempArr.push(item);
+      if (item.children) {
+        const childArray = this.UnfoldRouterArray(item.children);
+        childArray.forEach(child => {
+          tempArr.push(child)
+        })
+      }
+    })
+    return tempArr;
+  }
+
   render() {
     const { tabList, tabKey } = this.props;
     const userName = sessionStorage.getItem('account');
@@ -136,7 +152,7 @@ class SaasLayout extends React.Component {
             </div>
             <div className={styles.details}>
               {tabList.map(item => (
-                <div className={`${styles.tabLayout} ${item.name === tabKey ? styles.active : null}`} key={item.name}>{<AsyncComponent {...item} />}</div>
+                <div className={`${styles.tabLayout} ${item.path === tabKey ? styles.active : null}`} key={item.path}>{<AsyncComponent {...item} />}</div>
               ))}
             </div>
           </div>

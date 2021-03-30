@@ -13,7 +13,6 @@ class Navigation extends React.Component {
 
   // 跳转路由
   linkRouter = (item) => {
-    const pathUrl = `/${item.name.split('.').join('/')}`;
     history.push({
       pathname: item.path
     })
