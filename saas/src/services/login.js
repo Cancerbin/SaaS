@@ -23,6 +23,6 @@ export async function queryVerifyCode(params) {
 }
 
 // 获取菜单栏
-export async function queryRouterMenu(params) {
-  return request(`/api/oauth/menu/router?userId=${params.userId}`);
+export async function queryRouterMenu() {
+  return request(`/api/oauth/menu/router?ts=${new Date().getTime()}`);
 }

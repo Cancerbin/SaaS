@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect, history } from 'umi';
 import { SmileOutlined } from '@ant-design/icons';
-import routerJson from '@/utils/router.json';
 import styles from './index.less';
 
 class SideMenu extends React.Component {
@@ -11,7 +10,7 @@ class SideMenu extends React.Component {
     dispatch({
       type: 'global/updateSideMenu',
       payload: {
-        menu: item.name
+        menu: item.path
       }
     }).then(() => {
       history.push({
@@ -22,12 +21,13 @@ class SideMenu extends React.Component {
 
   render() {
     const { sideMenuKey } = this.props;
+    const router = JSON.parse(sessionStorage.getItem("router") || '[]');
     return (
       <div className={styles.nav}>
-        {routerJson.map(item => (
-          <dl key={item.name} className={item.name === sideMenuKey ? styles.active : null} onClick={() => this.linkRouter(item)}>
+        {router.map(item => (
+          <dl key={item.path} className={item.path === sideMenuKey ? styles.active : null} onClick={() => this.linkRouter(item)}>
             <dt><SmileOutlined /></dt>
-            <dd>{item.title}</dd>
+            <dd>{item.name}</dd>
           </dl>
         ))}
       </div>

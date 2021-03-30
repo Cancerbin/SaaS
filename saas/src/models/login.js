@@ -7,6 +7,7 @@ const Model = {
   namespace: 'login',
   state: {
     status: undefined,
+    routerData: []
   },
   effects: {
     *login({ payload }, { call, put }) {
@@ -17,9 +18,8 @@ const Model = {
         sessionStorage.setItem('account', data.account);
 
         // 请求路由菜单
-        // const routerResponse = yield call(queryRouterMenu, {
-        //   userId: data.userId
-        // });
+        const routerResponse = yield call(queryRouterMenu, {});
+        sessionStorage.setItem('router', JSON.stringify(routerResponse.data));
         history.replace('/');
       }
     },
@@ -44,6 +44,13 @@ const Model = {
     }
   },
   reducers: {
+    saveRouter(state, { payload }) {
+      sessionStorage.setItem('router', JSON.stringify(payload.data));
+      return {
+        ...state,
+        routerData: payload.data
+      }
+    },
     changeLoginStatus(state, { payload }) {
       setAuthority(payload.currentAuthority);
       return { ...state, status: payload.status, type: payload.type };

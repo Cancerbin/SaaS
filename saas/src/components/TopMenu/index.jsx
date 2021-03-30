@@ -1,21 +1,25 @@
 import React from 'react';
 import { connect, history } from 'umi';
 import { Tag } from 'antd';
+import styles from './index.less';
 
 class TopMenu extends React.Component {
   // 切换tab
   changeTab = (item) => {
-    const pathUrl = `/${item.name.split('.').join('/')}`;
-    history.push({
-      pathname: pathUrl
-    })
+    const { tabKey } = this.props;
+    if (tabKey !== item.name) {
+      const pathUrl = `/${item.name.split('.').join('/')}`;
+      history.push({
+        pathname: pathUrl
+      })
+    }
   }
 
   render() {
-    const { tabList } = this.props;
+    const { tabList, tabKey } = this.props;
     return (
-      <div>
-        {tabList.map(item => <Tag key={item.name} color="#2db7f5" closable onClick={() => this.changeTab(item)}>{item.title}</Tag>)}
+      <div className={styles.tabLayout}>
+        {tabList.map(item => <div className={`${styles.tab} ${tabKey === item.name ? styles.active : null}`} key={item.name} onClick={() => this.changeTab(item)}>{item.title}</div>)}
       </div>
     )
   }
@@ -23,4 +27,5 @@ class TopMenu extends React.Component {
 
 export default connect(({ global }) => ({
   tabList: global.tabList,
+  tabKey: global.tabKey
 }))(TopMenu);

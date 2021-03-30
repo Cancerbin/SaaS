@@ -81,33 +81,6 @@ class SaasLayout extends React.Component {
     })
   }
 
-  digui = (arr) => {
-    const tempArray = [];
-    arr.forEach(item => {
-      tempArray.push(item);
-      if (item.routes) {
-        const tempa = this.digui(item.routes);
-        tempa.forEach(i => {
-          tempArray.push(i)
-        })
-      }
-    })
-    return tempArray;
-  }
-
-  // 保存tab页
-  saveTabList = (arr) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/updateTabList',
-      payload: {
-        tabList: arr
-      }
-    }).then(res => {
-      this.formateTab();
-    })
-  }
-
   formateTab = () => {
     const { tabList, route } = this.props;
     const itit = this.digui(route.routes);

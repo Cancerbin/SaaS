@@ -8,7 +8,7 @@
 export default {
   dev: {
     '/api/': {
-      target: 'http://116.63.84.255:8760/',
+      target: 'http://test-passport.dbs12580.com/',
       changeOrigin: true,
       pathRewrite: {
         '^': '',

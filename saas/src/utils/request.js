@@ -46,6 +46,7 @@ const request = extend({
   credentials: 'include', // 默认请求是否带上cookie
 });
 
+// 请求拦截
 request.interceptors.request.use((url, options) => {
   const tenantValue = sessionStorage.getItem("tenant");
   options.headers.tenant = tenantValue;
@@ -54,7 +55,7 @@ request.interceptors.request.use((url, options) => {
 
   } else {
     const token = sessionStorage.getItem("token");
-    options.headers.token = token;
+    options.headers.token = `Bearer ${token}`;
   }
   return {
     url: `${url}`,
@@ -62,9 +63,10 @@ request.interceptors.request.use((url, options) => {
   };
 });
 
+// 请求返回拦截
 request.interceptors.response.use((response, options) => {
   // 处理get请求图片流
-  if (options.method === 'GET') {
+  if (options.method === 'GET' && response.url.indexOf('/api/oauth/anno/captcha') >= 0) {
     return response.blob();
   }
   return response;
