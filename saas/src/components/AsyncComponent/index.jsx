@@ -8,7 +8,7 @@ export default (props) => {
   // const pathUrl = pathArray.join('/');
   if (pathArray.length === 1) {
     Comp = dynamic({
-      loader: () => import(`@/pages/Navigation/index.jsx`)
+      loader: () => import(`@/pages/NavigationHome/index.jsx`)
     })
   } else {
     let pathUrl = "/xxx";

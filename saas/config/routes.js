@@ -21,7 +21,7 @@ export default [
           {
             path: '/nav',
             name: 'nav',
-            component: './Navigation',
+            component: './NavigationHome',
           }
         ]
       }
