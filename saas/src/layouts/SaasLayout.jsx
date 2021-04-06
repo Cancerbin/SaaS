@@ -160,7 +160,7 @@ class SaasLayout extends React.Component {
             </div>
             <div className={styles.details}>
               {tabList.map(item => (
-                <div className={`${styles.tabLayout}`} key={item.path}>{<AsyncComponent {...item} />}</div>
+                <div className={`${styles.tabLayout} ${item.path === tabKey ? styles.active : null}`} key={item.path}>{<AsyncComponent {...item} />}</div>
               ))}
             </div>
           </div>
