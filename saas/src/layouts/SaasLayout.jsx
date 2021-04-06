@@ -15,49 +15,57 @@ class SaasLayout extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    // 初始化SideMenu
-    dispatch({
-      type: 'global/updateSideMenu',
-      payload: {
-        menu: sessionStorage.getItem('sideMenuKey') || null
-      }
-    })
-    // 初始化tab表
-    this.updateTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
-    // 初始化TabKey
-    this.updateTabKey(sessionStorage.getItem('tabKey') || null);
-    // 监听路由变化
-    history.listen((location, action) => {
-      const tabList = JSON.parse(sessionStorage.getItem('tabList') || '[]');
-      // 获取当前tab
-      const currentPath = location.pathname;
-      const routerArray = JSON.parse(sessionStorage.getItem('router') || '[]');
-      if (currentPath !== '/') {
-        const currentPathNameArray = currentPath.slice(1, currentPath.length).split('/');
-        const currentTabArray = tabList.filter(item => item.path === currentPath);
-        // 判断tabList中是否包含当前tab
-        if (currentTabArray.length === 0) {
-          const newTabList = [...tabList];
-          if (currentPathNameArray.length === 1) {
-            const routerItem = {};
-            if (currentPath === '/nav') {
-              routerItem.name = '导航页';
-              routerItem.path = '/nav';
-            }
-            newTabList.unshift(routerItem);
-          } else if (currentPathNameArray.length === 4) {
-            const routerAll = this.UnfoldRouterArray(routerArray);
-            const routerItem = {};
-            const routerInfo = routerAll.filter(item => item.path === currentPath);
-            routerItem.name = routerInfo[0].name || '未知';
-            routerItem.path = currentPath;
-            newTabList.push(routerItem);
-          }
-          this.updateTabList(newTabList);
+    const userName = sessionStorage.getItem('account');
+    if (userName) {
+      // 初始化SideMenu
+      dispatch({
+        type: 'global/updateSideMenu',
+        payload: {
+          menu: sessionStorage.getItem('sideMenuKey') || null
         }
-        this.updateTabKey(currentPath);
-      }
-    });
+      })
+      // 初始化tab表
+      this.updateTabList(JSON.parse(sessionStorage.getItem('tabList') || '[]'));
+      // 初始化TabKey
+      this.updateTabKey(sessionStorage.getItem('tabKey') || null);
+      // 监听路由变化
+      history.listen((location, action) => {
+        const tabList = JSON.parse(sessionStorage.getItem('tabList') || '[]');
+        // 获取当前tab
+        const currentPath = location.pathname;
+        const routerArray = JSON.parse(sessionStorage.getItem('router') || '[]');
+        if (currentPath !== '/') {
+          const currentPathNameArray = currentPath.slice(1, currentPath.length).split('/');
+          const currentTabArray = tabList.filter(item => item.path === currentPath);
+          // 判断tabList中是否包含当前tab
+          if (currentTabArray.length === 0) {
+            const newTabList = [...tabList];
+            if (currentPathNameArray.length === 1) {
+              const routerItem = {};
+              if (currentPath === '/nav') {
+                routerItem.name = '导航页';
+                routerItem.path = '/nav';
+              }
+              newTabList.unshift(routerItem);
+            } else if (currentPathNameArray.length === 4) {
+              const routerAll = this.UnfoldRouterArray(routerArray);
+              const routerItem = {};
+              const routerInfo = routerAll.filter(item => item.path === currentPath);
+              routerItem.name = routerInfo[0].name || '未知';
+              routerItem.path = currentPath;
+              newTabList.push(routerItem);
+            }
+            this.updateTabList(newTabList);
+          }
+          this.updateTabKey(currentPath);
+        }
+      });
+    } else {
+      dispatch({
+        type: 'login/logout',
+        payload: {}
+      })
+    }
   }
 
   // 更新tabList
