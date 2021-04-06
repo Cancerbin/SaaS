@@ -4,14 +4,14 @@ import { dynamic } from 'umi';
 export default (props) => {
   let Comp;
   const pathArray = props.path.slice(1, props.path.length).split('/');
-  // const pathArray = nameArray.map(item => item.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase()));
-  // const pathUrl = pathArray.join('/');
   if (pathArray.length === 1) {
     Comp = dynamic({
       loader: () => import(`@/pages/NavigationHome/index.jsx`)
     })
   } else {
-    let pathUrl = "/xxx";
+    let pathUrl;
+    pathArray.shift();
+    pathUrl = pathArray.join('/');
     Comp = dynamic({
       loader: () => import(`@/pages/${pathUrl}/index.jsx`)
     })
