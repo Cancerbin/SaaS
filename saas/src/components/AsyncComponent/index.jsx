@@ -1,20 +1,38 @@
+import React from 'react';
 import { dynamic } from 'umi';
 
-// 动态加载组件
-export default (props) => {
-  let Comp;
-  const pathArray = props.path.slice(1, props.path.length).split('/');
-  if (pathArray.length === 1) {
-    Comp = dynamic({
-      loader: () => import(`@/pages/NavigationHome/index.jsx`)
-    })
-  } else {
-    let pathUrl;
-    pathArray.shift();
-    pathUrl = pathArray.join('/');
-    Comp = dynamic({
-      loader: () => import(`@/pages/${pathUrl}/index.jsx`)
+class AsyncComponent extends React.Component {
+  state = {
+    Comp: null
+  };
+
+  componentDidMount() {
+    let Comp;
+    const { path } = this.props;
+    const pathArray = path.slice(1, path.length).split('/');
+    if (pathArray.length === 1) {
+      Comp = dynamic({
+        loader: () => import(`@/pages/NavigationHome/index.jsx`)
+      })
+    } else {
+      let pathUrl;
+      pathArray.shift();
+      pathUrl = pathArray.join('/');
+      Comp = dynamic({
+        loader: () => import(`@/pages/${pathUrl}/index.jsx`)
+      })
+    }
+    this.setState({
+      Comp
     })
   }
-  return <Comp />;
-};
+
+  render() {
+    const { Comp } = this.state;
+    return (
+      <>{Comp && <Comp />}</>
+    )
+  }
+}
+
+export default AsyncComponent;
