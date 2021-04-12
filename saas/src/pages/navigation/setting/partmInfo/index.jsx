@@ -1,9 +1,23 @@
 import React from 'react';
 import { connect, history } from 'umi';
-import { Button, Space, message } from 'antd';
-import { SearchOutlined, PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Form, Button, Space, message, Divider } from 'antd';
+import { SearchOutlined, PlusCircleOutlined, CloseCircleOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import UniversalTable from '@/components/UniversalTable';
+import UniversalForm from '@/components/UniversalForm';
 import UpdateModal from './updateModal';
+
+const FormList = [
+  {
+    label: '部门编码',
+    name: 'branchNo',
+    type: 'input'
+  },
+  {
+    label: '部门名称',
+    name: 'branchName',
+    type: 'input'
+  }
+]
 
 class Department extends React.Component {
   formRef = React.createRef();
@@ -31,19 +45,43 @@ class Department extends React.Component {
     updateModalVisible: false,
     updateType: undefined,
     updateItem: {},
+
+    filterVisible: true,
+    filterValues: {}
   }
 
   componentDidMount() {
     this.queryDepartmentList();
   }
 
+  // 查询
+  searchForm = () => {
+    this.formRef.current.validateFields()
+      .then(values => {
+        this.setState({
+          filterValues: values,
+          departmentTableListPage: 1
+        }, () => {
+          this.queryDepartmentList();
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
   // 获取会员列表
   queryDepartmentList = () => {
     const { dispatch } = this.props;
+    const { filterValues, departmentTableListPage, departmentTableListSize } = this.state;
     dispatch({
       type: 'department/queryDepartmentList',
       payload: {
-        model: {}
+        current: departmentTableListPage,
+        size: departmentTableListSize,
+        model: {
+          ...filterValues
+        }
       }
     }).then(res => {
       if (res && res.code === 0) {
@@ -56,6 +94,7 @@ class Department extends React.Component {
     })
   }
 
+  // 新增
   addDepartment = () => {
     this.setState({
       updateModalVisible: true,
@@ -178,9 +217,18 @@ class Department extends React.Component {
     })
   }
 
+  // 操控条件显示与隐藏
+  controlFilter = () => {
+    const { filterVisible } = this.state;
+    this.setState({
+      filterVisible: !filterVisible
+    })
+  }
+
   render() {
     const { loadingList, loadingSave, loadingDelete } = this.props;
     const {
+      filterVisible,
       // 表格数据
       departmentTableColumns,
       departmentTableList,
@@ -193,14 +241,30 @@ class Department extends React.Component {
       updateType,
       updateItem
     } = this.state;
+    const layout = {
+      labelCol: { span: 8 },
+      wrapperCol: { span: 16 },
+    };
     return (
       <div className="main-layout">
         <div className="main-layout-header">
           <Space>
-            <Button type="primary" icon={<SearchOutlined />} onClick={this.queryDepartmentList}>查询</Button>
+            <Button type="primary" icon={<SearchOutlined />} onClick={this.searchForm}>查询</Button>
             <Button type="primary" icon={<PlusCircleOutlined />} onClick={this.addDepartment}>新增</Button>
             <Button type="primary" icon={<CloseCircleOutlined />} onClick={this.closePage}>关闭</Button>
+            <Button type="primary" icon={filterVisible ? <UpOutlined /> : <DownOutlined />} onClick={this.controlFilter}>{filterVisible ? '隐藏' : '显示'}查询条件</Button>
           </Space>
+          <Divider className="custom-divider" />
+          <Form
+            ref={this.formRef}
+            name="advanced"
+            size="middle"
+            className="custom-search-form"
+            style={{ display: filterVisible ? 'block' : 'none' }}
+            {...layout}
+          >
+            <UniversalForm formList={FormList} />
+          </Form>
         </div>
         <div className="main-layout-content">
           <UniversalTable

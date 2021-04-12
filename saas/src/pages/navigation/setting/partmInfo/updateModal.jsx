@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button } from 'antd';
-import { PlusCircleOutlined, DeliveredProcedureOutlined, DeleteOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, DeliveredProcedureOutlined, DeleteOutlined, CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 class UpdateModal extends React.Component {
   formRef = React.createRef();
@@ -35,6 +35,20 @@ class UpdateModal extends React.Component {
       })
   }
 
+  deleteEvent = () => {
+    const { bindEvent, detail } = this.props;
+    Modal.confirm({
+      content: `确定定要删除部门信息【${detail.branchNo}】吗？`,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        bindEvent('delete')
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+
   render() {
     const { type = 'add', detail = {}, loadingSave = false, loadingDelete = false, bindEvent } = this.props;
     const { updateModalVisible } = this.state;
@@ -51,7 +65,7 @@ class UpdateModal extends React.Component {
           <>
             <Button type="primary" icon={<PlusCircleOutlined />} onClick={this.add}>新增</Button>
             <Button type="primary" icon={<DeliveredProcedureOutlined />} onClick={this.submitForm} loading={loadingSave}>保存</Button>
-            <Button type="primary" icon={<DeleteOutlined />} disabled={type === 'add'} onClick={() => bindEvent('delete')} loading={loadingDelete}>删除</Button>
+            <Button type="primary" icon={<DeleteOutlined />} disabled={type === 'add'} onClick={this.deleteEvent} loading={loadingDelete}>删除</Button>
             <Button type="primary" icon={<CloseCircleOutlined />} onClick={() => bindEvent('close')}>关闭</Button>
           </>
         )}
