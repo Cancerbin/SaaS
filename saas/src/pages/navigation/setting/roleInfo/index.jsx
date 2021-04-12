@@ -5,35 +5,40 @@ import { SearchOutlined, PlusCircleOutlined, CloseCircleOutlined, UpOutlined, Do
 import UniversalTable from '@/components/UniversalTable';
 import UniversalForm from '@/components/UniversalForm';
 import UpdateModal from './updateModal';
-import { filterSearchTerm } from '@/utils/utils';
 
 const FormList = [
   {
-    label: '部门编码',
-    name: 'branchNo',
+    label: '角色编码',
+    name: 'code',
     type: 'input'
   },
   {
-    label: '部门名称',
-    name: 'branchName',
+    label: '角色名称',
+    name: 'name',
     type: 'input'
   }
 ]
 
-class Department extends React.Component {
+class Character extends React.Component {
   formRef = React.createRef();
 
   state = {
     tableColumns: [
       {
-        title: '部门编码',
-        dataIndex: 'branchNo',
+        title: '角色编码',
+        dataIndex: 'code',
         width: 180,
         align: 'center'
       },
       {
-        title: '部门名称',
-        dataIndex: 'branchName',
+        title: '角色名称',
+        dataIndex: 'name',
+        width: 180,
+        align: 'center'
+      },
+      {
+        title: '备注',
+        dataIndex: 'describe',
         width: 180,
         align: 'center'
       }
@@ -48,11 +53,13 @@ class Department extends React.Component {
     updateItem: {},
 
     filterVisible: true,
-    filterValues: {}
+    filterValues: {},
+
+    roleMemberList: []
   }
 
   componentDidMount() {
-    this.queryDepartmentList();
+    this.queryCharacterList();
   }
 
   // 查询
@@ -60,10 +67,10 @@ class Department extends React.Component {
     this.formRef.current.validateFields()
       .then(values => {
         this.setState({
-          filterValues: filterSearchTerm(values),
+          filterValues: values,
           page: 1
         }, () => {
-          this.queryDepartmentList();
+          this.queryCharacterList();
         })
       })
       .catch(err => {
@@ -71,12 +78,12 @@ class Department extends React.Component {
       })
   }
 
-  // 获取会员列表
-  queryDepartmentList = () => {
+  // 获取角色列表
+  queryCharacterList = () => {
     const { dispatch } = this.props;
     const { filterValues, page, size } = this.state;
     dispatch({
-      type: 'department/queryDepartmentList',
+      type: 'character/queryCharacterList',
       payload: {
         current: page,
         size: size,
@@ -122,14 +129,52 @@ class Department extends React.Component {
     })
   }
 
+  // 关闭页面
+  closePage = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'global/deleteTabKey',
+      payload: {
+        path: history.location.pathname
+      }
+    })
+  }
+
+  // 绑定事件
+  bindEvent = (type, key, record) => {
+    switch (type) {
+      case 'add':
+        this.setState({
+          updateType: 'add',
+          updateItem: {}
+        })
+        break;
+
+      case 'save':
+        this.saveCharacter(type, key, record);
+        break;
+
+      case 'delete':
+        this.saveCharacter(type, key, record);
+        break;
+
+      case 'close':
+        this.closeUpdateModal();
+        break;
+
+      default:
+        break;
+    }
+  }
+
   // 保存信息
-  saveDepartment = (type, record) => {
+  saveCharacter = (type, key, record) => {
     const { dispatch } = this.props;
     const { updateType, updateItem } = this.state;
     let params;
     let requestType;
     if (type === 'save') {
-      requestType = `department/${updateType === 'add' ? 'addMechanismInfo' : 'updateMechanismInfo'}`;
+      requestType = `character/${key === 'baseInfo' ? 'updateCharacterInfo' : 'updateMechanismInfo'}`;
       params = {
         ...updateItem,
         ...record
@@ -153,16 +198,17 @@ class Department extends React.Component {
     }).then(res => {
       if (res && res.code === 0) {
         if (type === 'save') {
-          message.success({
-            content: `${updateType === 'add' ? '新增' : '修改'}成功`,
-            duration: 2
-          })
-          this.setState({
-            updateType: 'update',
-            updateItem: res.data
-          }, () => {
-            this.queryDepartmentList();
-          })
+          console.log(res)
+          // message.success({
+          //   content: `${updateType === 'add' ? '新增' : '修改'}成功`,
+          //   duration: 2
+          // })
+          // this.setState({
+          //   updateType: 'update',
+          //   updateItem: res.data
+          // }, () => {
+          //   this.queryDepartmentList();
+          // })
         } else {
           message.success({
             content: '删除成功',
@@ -176,44 +222,6 @@ class Department extends React.Component {
             this.queryDepartmentList();
           })
         }
-      }
-    })
-  }
-
-  // 绑定事件
-  bindEvent = (type, record) => {
-    switch (type) {
-      case 'add':
-        this.setState({
-          updateType: 'add',
-          updateItem: {}
-        })
-        break;
-
-      case 'save':
-        this.saveDepartment(type, record)
-        break;
-
-      case 'delete':
-        this.saveDepartment(type, record);
-        break;
-
-      case 'close':
-        this.closeUpdateModal();
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  // 关闭页面
-  closePage = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/deleteTabKey',
-      payload: {
-        path: history.location.pathname
       }
     })
   }
@@ -240,7 +248,9 @@ class Department extends React.Component {
       // 弹窗模式
       updateModalVisible,
       updateType,
-      updateItem
+      updateItem,
+
+      roleMemberList
     } = this.state;
     const layout = {
       labelCol: { span: 8 },
@@ -287,6 +297,7 @@ class Department extends React.Component {
             loadingSave={loadingSave}
             loadingDelete={loadingDelete}
             bindEvent={this.bindEvent}
+            roleMemberList={roleMemberList}
           />
         }
       </div>
@@ -294,8 +305,6 @@ class Department extends React.Component {
   }
 }
 
-export default connect(({ global, department, loading }) => ({
-  loadingList: loading.effects['department/queryDepartmentList'],
-  loadingSave: loading.effects['department/addMechanismInfo'] || loading.effects['department/updateMechanismInfo'],
-  loadingDelete: loading.effects['department/deleteMechanismInfo'],
-}))(Department);
+export default connect(({ global, character, loading }) => ({
+  loadingList: loading.effects['character/queryCharacterList']
+}))(Character);

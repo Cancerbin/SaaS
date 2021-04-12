@@ -25,3 +25,12 @@ export const isAntDesignProOrDev = () => {
   return isAntDesignPro();
 };
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
+export const filterSearchTerm = (params) => {
+  for (let i in params) {
+    if (typeof params[i] === "string") {
+      params[i] = params[i].trim();
+    }
+  }
+  return params;
+};

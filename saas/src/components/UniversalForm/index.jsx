@@ -6,7 +6,6 @@ class UniversalForm extends React.Component {
     const {
       formList = []
     } = this.props;
-    console.log(formList)
     return (
       <Row>
         {formList.map(item => (
