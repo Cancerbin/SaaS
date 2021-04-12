@@ -15,8 +15,14 @@ class TopMenu extends React.Component {
   }
 
   closeTab = (e, item) => {
+    const { dispatch } = this.props;
     e.stopPropagation();
-    console.log(item)
+    dispatch({
+      type: "global/deleteTabKey",
+      payload: {
+        path: item.path
+      }
+    })
   }
 
   render() {

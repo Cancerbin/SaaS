@@ -33,12 +33,15 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
-    &-thead > tr,
-    &-tbody > tr {
-      > th,
-      > td {
+
+    &-thead>tr,
+    &-tbody>tr {
+
+      >th,
+      >td {
         white-space: pre;
-        > span {
+
+        >span {
           display: block;
         }
       }
@@ -47,8 +50,32 @@ ol {
 }
 
 // 兼容IE11
-@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
-  body .ant-design-pro > .ant-layout {
+@media screen and(-ms-high-contrast: active),
+(-ms-high-contrast: none) {
+  body .ant-design-pro>.ant-layout {
     min-height: 100vh;
   }
+}
+
+.main-layout {
+  display: flex;
+  height: calc(100vh - 94px);
+  flex-direction: column;
+
+  .main-layout-header {
+    padding: 8px;
+    background-color: #fff;
+  }
+
+  .main-layout-content {
+    flex: 1;
+    margin: 10px 0;
+    padding: 8px;
+    background-color: #fff;
+  }
+}
+
+.custom-modal {
+  top: 94px !important;
+  left: 100px !important;
 }
