@@ -45,12 +45,10 @@ class UpdateModal extends React.Component {
 
   componentDidUpdate(preProps) {
     if (preProps.detail.id !== this.props.detail.id) {
-      console.log(this.props.detail)
+      if (this.props.detail.id) {
+        this.queryCharacterAuthoriza();
+      }
     }
-    // if ((preProps.detail.id !== this.props.detail.id) && this.props.detail.id) {
-    //   console.log(this.props.detail)
-    //   this.queryCharacterAuthoriza();
-    // }
   }
 
   // 获取授权信息
@@ -87,14 +85,18 @@ class UpdateModal extends React.Component {
 
   submitForm = () => {
     const { bindEvent } = this.props;
-    const { tabKey } = this.state;
-    this.baseInfoRef.current.validateFields()
-      .then(values => {
-        bindEvent('save', tabKey, values)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    const { tabKey, authorizaList } = this.state;
+    if (tabKey === "baseInfo") {
+      this.baseInfoRef.current.validateFields()
+        .then(values => {
+          bindEvent('save', tabKey, values)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    } else {
+      bindEvent('save', tabKey, authorizaList)
+    }
   }
 
   deleteEvent = () => {
