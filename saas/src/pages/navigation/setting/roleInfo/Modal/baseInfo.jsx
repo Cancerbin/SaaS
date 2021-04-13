@@ -1,55 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Input } from 'antd';
+import UniversalForm from '@/components/UniversalForm';
 
 class BaseInfo extends React.Component {
   render() {
     const { detail, refs, type = 'add' } = this.props;
     const layout = {
-      labelCol: { span: 4 },
+      labelCol: { span: 3 },
       wrapperCol: { span: 8 },
     };
+    const FormList = [
+      {
+        label: '角色编码',
+        name: 'code',
+        type: 'input',
+        col: 24,
+        disabled: type === 'update',
+        rules: [
+          {
+            required: true,
+            message: 'Please input your 部门编码!',
+          },
+        ]
+      },
+      {
+        label: '角色名称',
+        name: 'name',
+        type: 'input',
+        col: 24,
+        rules: [
+          {
+            required: true,
+            message: 'Please input your 部门名称!',
+          },
+        ]
+      },
+      {
+        label: '备注',
+        name: 'describe',
+        type: 'input',
+        col: 24,
+      }
+    ]
     return (
-      <Form
-        name="basic"
-        ref={refs}
-        initialValues={{
-          code: detail.code,
-          name: detail.name,
-          describe: detail.describe
-        }}
-        {...layout}
-      >
-        <Form.Item
-          label="角色编码"
-          name="code"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your 部门编码!',
-            },
-          ]}
+      <div className="custom-card">
+        <div className="custom-card-orientation"><a>基本信息</a></div>
+        <Form
+          name="basic"
+          ref={refs}
+          initialValues={{
+            code: detail.code,
+            name: detail.name,
+            describe: detail.describe
+          }}
+          {...layout}
         >
-          <Input disabled={type === 'update'} />
-        </Form.Item>
-        <Form.Item
-          label="角色名称"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your 部门名称!',
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="备注"
-          name="describe"
-        >
-          <Input />
-        </Form.Item>
-      </Form>
+          <UniversalForm formList={FormList} />
+        </Form>
+      </div>
     )
   }
 }

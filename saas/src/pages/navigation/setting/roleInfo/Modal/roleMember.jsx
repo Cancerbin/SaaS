@@ -58,6 +58,7 @@ class RoleMember extends React.Component {
   }
 
   render() {
+    const { loadingList } = this.props;
     const { tableColumns, tableList } = this.state;
     return (
       <Table
@@ -69,10 +70,12 @@ class RoleMember extends React.Component {
           hideOnSinglePage: true
         }}
         rowKey="id"
+        loading={!!loadingList}
       />
     )
   }
 }
 
 export default connect(({ character, loading }) => ({
+  loadingList: loading.effects['character/queryRoleMemberList']
 }))(RoleMember);

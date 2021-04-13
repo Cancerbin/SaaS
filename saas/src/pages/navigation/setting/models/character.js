@@ -1,7 +1,10 @@
 import {
   queryCharacterList,
   queryRoleMemberList,
-  updateCharacterInfo
+  updateCharacterInfo,
+  addCharacterInfo,
+  deleteCharacterInfo,
+  queryCharacterAuthoriza
 } from '@/services/character';
 export default {
   namespace: 'character',
@@ -17,6 +20,18 @@ export default {
     },
     *updateCharacterInfo({ payload }, { call, put }) {
       const response = yield call(updateCharacterInfo, payload);
+      return response;
+    },
+    *addCharacterInfo({ payload }, { call, put }) {
+      const response = yield call(addCharacterInfo, payload);
+      return response;
+    },
+    *deleteCharacterInfo({ payload }, { call, put }) {
+      const response = yield call(deleteCharacterInfo, payload);
+      return response;
+    },
+    *queryCharacterAuthoriza({ payload }, { call, put }) {
+      const response = yield call(queryCharacterAuthoriza, payload);
       return response;
     },
   },

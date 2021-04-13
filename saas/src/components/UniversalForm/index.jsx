@@ -9,12 +9,13 @@ class UniversalForm extends React.Component {
     return (
       <Row>
         {formList.map(item => (
-          <Col span={8} key={item.name}>
+          <Col span={item.col || 8} key={item.name}>
             <Form.Item
               name={item.name}
               label={item.label}
+              rules={item.rules || null}
             >
-              <Input />
+              <Input disabled={item.disabled} />
             </Form.Item>
           </Col>
         ))}

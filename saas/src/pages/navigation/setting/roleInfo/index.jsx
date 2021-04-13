@@ -54,8 +54,6 @@ class Character extends React.Component {
 
     filterVisible: true,
     filterValues: {},
-
-    roleMemberList: []
   }
 
   componentDidMount() {
@@ -174,19 +172,16 @@ class Character extends React.Component {
     let params;
     let requestType;
     if (type === 'save') {
-      requestType = `character/${key === 'baseInfo' ? 'updateCharacterInfo' : 'updateMechanismInfo'}`;
+      requestType = `character/${updateType === 'add' ? 'addCharacterInfo' : key === 'baseInfo' ? 'updateCharacterInfo' : 'updateMechanismInfo'}`;
       params = {
         ...updateItem,
         ...record
       }
       if (updateType === 'add') {
-        params.type = {
-          key: "02"
-        };
-        params.label = record.branchName;
+        params.dsType = 'ALL';
       }
     } else {
-      requestType = 'department/deleteMechanismInfo';
+      requestType = 'character/deleteCharacterInfo';
       params = {
         ids: updateItem.id
       }
@@ -198,17 +193,16 @@ class Character extends React.Component {
     }).then(res => {
       if (res && res.code === 0) {
         if (type === 'save') {
-          console.log(res)
-          // message.success({
-          //   content: `${updateType === 'add' ? '新增' : '修改'}成功`,
-          //   duration: 2
-          // })
-          // this.setState({
-          //   updateType: 'update',
-          //   updateItem: res.data
-          // }, () => {
-          //   this.queryDepartmentList();
-          // })
+          message.success({
+            content: `${updateType === 'add' ? '新增' : '修改'}成功`,
+            duration: 2
+          })
+          this.setState({
+            updateType: 'update',
+            updateItem: res.data
+          }, () => {
+            this.queryCharacterList();
+          })
         } else {
           message.success({
             content: '删除成功',
@@ -219,7 +213,7 @@ class Character extends React.Component {
             updateType: undefined,
             updateItem: {}
           }, () => {
-            this.queryDepartmentList();
+            this.queryCharacterList();
           })
         }
       }
@@ -249,8 +243,6 @@ class Character extends React.Component {
       updateModalVisible,
       updateType,
       updateItem,
-
-      roleMemberList
     } = this.state;
     const layout = {
       labelCol: { span: 8 },
@@ -297,7 +289,6 @@ class Character extends React.Component {
             loadingSave={loadingSave}
             loadingDelete={loadingDelete}
             bindEvent={this.bindEvent}
-            roleMemberList={roleMemberList}
           />
         }
       </div>
@@ -306,5 +297,7 @@ class Character extends React.Component {
 }
 
 export default connect(({ global, character, loading }) => ({
+  loadingSave: loading.effects['character/addCharacterInfo'] || loading.effects['character/updateCharacterInfo'],
+  loadingDelete: loading.effects['character/deleteCharacterInfo'],
   loadingList: loading.effects['character/queryCharacterList']
 }))(Character);

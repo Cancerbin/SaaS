@@ -1,7 +1,9 @@
 import React from 'react';
+import { connect } from 'umi';
 import { Modal, Tabs, Button } from 'antd';
 import { PlusCircleOutlined, DeliveredProcedureOutlined, DeleteOutlined, CloseCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import BaseInfo from './Modal/baseInfo';
+import Authoriza from './Modal/Authoriza';
 import RoleMember from './Modal/roleMember';
 
 const { TabPane } = Tabs;
@@ -26,22 +28,61 @@ class UpdateModal extends React.Component {
 
   state = {
     tabKey: "baseInfo",
-    updateModalVisible: false
+    updateModalVisible: false,
+    authorizaList: []
   }
 
   componentDidMount() {
+    const { detail } = this.props;
     this.setState({
       updateModalVisible: true
+    }, () => {
+      if (detail.id) {
+        this.queryCharacterAuthoriza();
+      }
+    })
+  }
+
+  componentDidUpdate(preProps) {
+    if (preProps.detail.id !== this.props.detail.id) {
+      console.log(this.props.detail)
+    }
+    // if ((preProps.detail.id !== this.props.detail.id) && this.props.detail.id) {
+    //   console.log(this.props.detail)
+    //   this.queryCharacterAuthoriza();
+    // }
+  }
+
+  // 获取授权信息
+  queryCharacterAuthoriza = () => {
+    const { dispatch, detail } = this.props;
+    dispatch({
+      type: 'character/queryCharacterAuthoriza',
+      payload: {
+        id: detail.id
+      }
+    }).then(res => {
+      if (res && res.code === 0) {
+        this.setState({
+          authorizaList: res.data.roleMenuTreeList
+        })
+      }
     })
   }
 
   add = () => {
     const { bindEvent } = this.props;
-    this.formRef.current.setFieldsValue({
-      branchNo: undefined,
-      branchName: undefined
-    });
-    bindEvent('add');
+    this.setState({
+      tabKey: "baseInfo"
+    }, () => {
+      this.baseInfoRef.current.setFieldsValue({
+        code: undefined,
+        name: undefined,
+        describe: undefined
+      });
+      bindEvent('add');
+    })
+
   }
 
   submitForm = () => {
@@ -59,7 +100,8 @@ class UpdateModal extends React.Component {
   deleteEvent = () => {
     const { bindEvent, detail } = this.props;
     Modal.confirm({
-      content: `确定定要删除部门信息【${detail.branchNo}】吗？`,
+      centered: true,
+      content: `确定定要删除角色信息【${detail.code}】吗？`,
       icon: <ExclamationCircleOutlined />,
       onOk() {
         bindEvent('delete')
@@ -77,13 +119,110 @@ class UpdateModal extends React.Component {
     })
   }
 
+  changeItem = (type, e, field, row) => {
+    const checkedValue = e.target.checked ? 1 : 0;
+    const { authorizaList } = this.state;
+    const newlist = [...authorizaList];
+    const fieldArray = ["viewResource", "addResource", "editResource", "deleteResource", "auditResource", "inputResource", "exportResource", "printResource", "setResource", "otherResource", "invalidResource"];
+
+    if (type === 'all') {
+      const TraverseChild = (arr) => {
+        arr.forEach((item, index) => {
+          arr[index].status = checkedValue;
+          fieldArray.forEach(ifield => {
+            if (arr[index][ifield].status !== 2 && arr[index][ifield].status !== checkedValue) {
+              arr[index][ifield].status = checkedValue;
+            }
+          })
+          if (arr[index].children) {
+            TraverseChild(arr[index].children);
+          }
+        })
+      }
+      TraverseChild(newlist);
+    } else {
+      let parentPath;
+      const FindParent = (array, id, cache) => {
+        array.forEach(item => {
+          const tempArray = [...cache];
+          if (item.id === id) {
+            tempArray.push(item.id)
+            parentPath = tempArray;
+          } else {
+            if (item.children) {
+              tempArray.push(item.id)
+              FindParent(item.children, id, tempArray)
+            }
+          }
+        })
+      }
+      FindParent(newlist, row.id, []);
+
+      let updateObject;
+      const FindIndex = (array, num) => {
+        let index;
+        let tempArray;
+        if (num === 0) {
+          index = array.findIndex(item => item.id === parentPath[num]);
+          tempArray = array[index];
+        } else {
+          index = array.children.findIndex(item => item.id === parentPath[num]);
+          tempArray = array.children[index];
+        }
+
+        if (num === parentPath.length - 1) {
+          updateObject = num === 0 ? array[index] : array.children[index];
+        } else {
+          FindIndex(tempArray, num + 1);
+        }
+      }
+      FindIndex(newlist, 0);
+
+      const TraverseChild = (obj) => {
+        if (obj.children) {
+          obj.children.forEach((item, index) => {
+            if (field === 'id') {
+              obj.children[index].status = checkedValue;
+              fieldArray.forEach(ifield => {
+                if (obj.children[index][ifield].status !== 2) {
+                  obj.children[index][ifield].status = checkedValue;
+                }
+              })
+            } else {
+              if (obj.children[index][field].status !== 2) {
+                obj.children[index][field].status = checkedValue;
+              }
+            }
+            TraverseChild(item);
+          })
+        }
+      }
+      if (field === 'id') {
+        updateObject.status = checkedValue;
+        fieldArray.forEach(item => {
+          if (updateObject[item].status !== 2) {
+            updateObject[item].status = checkedValue;
+          }
+        })
+      } else {
+        updateObject[field].status = checkedValue;
+      }
+
+      TraverseChild(updateObject);
+    }
+
+    this.setState({
+      authorizaList: newlist
+    })
+  }
+
   render() {
     const { type = 'add', detail = {}, loadingSave = false, loadingDelete = false, bindEvent } = this.props;
-    const { updateModalVisible, tabKey } = this.state;
+    const { updateModalVisible, tabKey, authorizaList } = this.state;
     return (
       <Modal
         wrapClassName="custom-modal"
-        width="80%"
+        width="1000px"
         maskStyle={{ top: '94px', left: '100px' }}
         title={`角色信息【${type === 'add' ? '新增' : detail.code}】`}
         visible={updateModalVisible}
@@ -103,6 +242,12 @@ class UpdateModal extends React.Component {
           {TabList.map(item => (
             <TabPane tab={item.title} key={item.key} disabled={type === 'add' && item.key !== 'baseInfo'}>
               {item.key === 'baseInfo' && <BaseInfo refs={this.baseInfoRef} detail={detail} type={type} />}
+              {item.key === 'authoriza' &&
+                <Authoriza
+                  list={authorizaList}
+                  changeItem={this.changeItem}
+                  checkAll={this.checkAll}
+                />}
               {item.key === 'roleMember' && <RoleMember id={detail.id} />}
             </TabPane>
           ))}
@@ -112,4 +257,5 @@ class UpdateModal extends React.Component {
   }
 }
 
-export default UpdateModal;
+export default connect(({ character }) => ({
+}))(UpdateModal);
